@@ -19,7 +19,7 @@ const Login = () => {
       await signIn(email, password);
       navigate("/");
     } catch (error) {
-      console.error(error);
+      console.error("Login error:", error);
     } finally {
       setLoading(false);
     }
@@ -42,6 +42,7 @@ const Login = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="exemple@email.com"
                 required
               />
             </div>
@@ -54,11 +55,12 @@ const Login = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="Votre mot de passe"
                 required
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Connexion..." : "Se connecter"}
+              {loading ? "Connexion en cours..." : "Se connecter"}
             </Button>
           </form>
         </CardContent>

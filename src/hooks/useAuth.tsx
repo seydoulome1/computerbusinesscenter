@@ -3,7 +3,6 @@ import {
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   onAuthStateChanged,
-  User as FirebaseUser,
 } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
@@ -26,11 +25,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      console.log("Auth state changed:", firebaseUser);
       if (firebaseUser) {
         try {
           const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+          console.log("User doc exists:", userDoc.exists());
           if (userDoc.exists()) {
-            setUser({ id: userDoc.id, ...userDoc.data() } as User);
+            const userData = { id: userDoc.id, ...userDoc.data() } as User;
+            console.log("User data:", userData);
+            setUser(userData);
+          } else {
+            console.log("No user document found for uid:", firebaseUser.uid);
+            toast({
+              title: "Erreur",
+              description: "Compte utilisateur non trouvé",
+              variant: "destructive",
+            });
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
@@ -51,10 +61,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log("Attempting to sign in with email:", email);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log("Sign in successful:", userCredential.user);
+      
       const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
+      console.log("User doc exists:", userDoc.exists());
+      
       if (userDoc.exists()) {
-        setUser({ id: userDoc.id, ...userDoc.data() } as User);
+        const userData = { id: userDoc.id, ...userDoc.data() } as User;
+        console.log("User data:", userData);
+        setUser(userData);
+      } else {
+        console.log("No user document found for uid:", userCredential.user.uid);
+        toast({
+          title: "Erreur",
+          description: "Compte utilisateur non trouvé dans la base de données",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error signing in:", error);
@@ -71,6 +95,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await firebaseSignOut(auth);
       setUser(null);
+      toast({
+        title: "Déconnexion réussie",
+        description: "Vous avez été déconnecté avec succès",
+      });
     } catch (error) {
       console.error("Error signing out:", error);
       toast({
