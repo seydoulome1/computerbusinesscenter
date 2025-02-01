@@ -7,6 +7,7 @@ import {
   CreditCard,
   Settings,
   AlertCircle,
+  Users,
 } from "lucide-react";
 
 export const Sidebar = () => {
@@ -35,6 +36,11 @@ export const Sidebar = () => {
       path: "/credits",
       name: "Crédits",
       icon: CreditCard,
+    },
+    {
+      path: "/clients",
+      name: "Clients",
+      icon: Users,
     },
     {
       path: "/alerts",
