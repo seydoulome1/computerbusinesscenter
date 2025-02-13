@@ -1,3 +1,4 @@
+
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -57,8 +58,8 @@ export const Sidebar = () => {
   return (
     <aside className="bg-white w-64 min-h-screen p-4 shadow-lg">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-primary">Hasbandgesco</h2>
-        <p className="text-sm text-gray-500">Gestion de librairie</p>
+        <h2 className="text-2xl font-bold text-primary">EDOH GESCO</h2>
+        <p className="text-sm text-gray-500">Gestion commerciale</p>
       </div>
       <nav className="space-y-2">
         {menuItems.map((item) => (
