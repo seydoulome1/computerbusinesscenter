@@ -1,9 +1,10 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { Package, Search } from "lucide-react";
+import { globalProducts } from "./Products";
 import {
   Table,
   TableBody,
@@ -12,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Package, Search } from "lucide-react";
 
 interface CartItem {
   id: string;
@@ -26,17 +26,7 @@ const POS = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
 
-  // Simulons quelques produits pour l'exemple
-  const products = [
-    { id: "1", name: "Cahier 200 pages", price: 500, stock: 100, image: "/placeholder.svg" },
-    { id: "2", name: "Stylo bleu", price: 200, stock: 150, image: "/placeholder.svg" },
-    { id: "3", name: "Cartable", price: 5000, stock: 20, image: "/placeholder.svg" },
-    { id: "4", name: "Crayon", price: 100, stock: 200, image: "/placeholder.svg" },
-    { id: "5", name: "Règle", price: 300, stock: 80, image: "/placeholder.svg" },
-    { id: "6", name: "Gomme", price: 150, stock: 120, image: "/placeholder.svg" },
-  ];
-
-  const addToCart = (product: typeof products[0]) => {
+  const addToCart = (product: typeof globalProducts[0]) => {
     setCart((currentCart) => {
       const existingItem = currentCart.find((item) => item.id === product.id);
       if (existingItem) {
@@ -75,7 +65,7 @@ const POS = () => {
     setCart([]);
   };
 
-  const filteredProducts = products.filter((product) =>
+  const filteredProducts = globalProducts.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -104,7 +94,15 @@ const POS = () => {
                 className="h-auto p-4 flex flex-col items-center gap-2"
                 onClick={() => addToCart(product)}
               >
-                <Package className="h-8 w-8 mb-2" />
+                {product.image ? (
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-16 h-16 object-cover rounded mb-2"
+                  />
+                ) : (
+                  <Package className="h-16 w-16 mb-2" />
+                )}
                 <span className="font-medium text-sm">{product.name}</span>
                 <span className="text-sm text-gray-600">{product.price} FCFA</span>
               </Button>
