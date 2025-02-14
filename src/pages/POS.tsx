@@ -1,11 +1,16 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Package, Search, Printer, User, Plus, Minus } from "lucide-react";
+import { Package, Search, Printer, User, Plus, Minus, Home } from "lucide-react";
 import { globalProducts } from "./Products";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -29,7 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Badge } from "@/components/ui/badge";
 
 interface CartItem {
   id: string;
@@ -63,6 +68,14 @@ const POS = () => {
   const [clientInfo, setClientInfo] = useState<Client | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
   const { toast } = useToast();
+
+  const categories = [
+    { id: "beverages", name: "Boissons" },
+    { id: "electronics", name: "Électronique" },
+    { id: "stationery", name: "Papeterie" },
+    { id: "fruits", name: "Fruits et Légumes" },
+    { id: "services", name: "Services" },
+  ];
 
   const addToCart = (product: typeof globalProducts[0]) => {
     setCart((currentCart) => {
@@ -115,11 +128,9 @@ const POS = () => {
       return;
     }
 
-    // Si ce n'est pas un crédit, on peut procéder directement à la vente
     if (paymentMethod !== "credit") {
       finalizeSale();
     } else {
-      // Pour un crédit, on vérifie une dernière fois les infos client
       if (clientInfo) {
         finalizeSale();
       }
@@ -215,93 +226,41 @@ const POS = () => {
   };
 
   const filteredProducts = globalProducts.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    searchTerm ? product.name.toLowerCase().includes(searchTerm.toLowerCase()) : true
   );
 
   return (
-    <div className="container mx-auto p-6 grid grid-cols-12 gap-6">
-      {/* Section des produits */}
-      <div className="col-span-8">
-        <Card className="p-6">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <Input
-                type="search"
-                placeholder="Rechercher un produit..."
-                className="pl-10"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-3 gap-4">
-            {filteredProducts.map((product) => (
-              <Button
-                key={product.id}
-                variant="outline"
-                className="h-auto p-4 flex flex-col items-center gap-2"
-                onClick={() => addToCart(product)}
-              >
-                {product.image ? (
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-16 h-16 object-cover rounded mb-2"
-                  />
-                ) : (
-                  <Package className="h-16 w-16 mb-2" />
-                )}
-                <span className="font-medium text-sm">{product.name}</span>
-                <span className="text-sm text-gray-600">{product.price} FCFA</span>
-              </Button>
-            ))}
-          </div>
-        </Card>
-      </div>
-
-      {/* Section du panier */}
-      <div className="col-span-4">
-        <Card className="p-6">
+    <div className="h-[calc(100vh-4rem)] flex gap-6 p-6">
+      <div className="w-[400px] flex flex-col gap-4">
+        <Card className="flex-1 p-4">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Panier</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-bold">Panier</h2>
+              <Badge variant="secondary">{cart.length}</Badge>
+            </div>
             <Button variant="outline" onClick={() => setShowClientDialog(true)}>
               <User className="h-4 w-4 mr-2" />
               {clientInfo ? 'Modifier client' : 'Ajouter client'}
             </Button>
           </div>
-          
+
           {clientInfo && (
-            <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+            <div className="mb-4 p-3 bg-secondary rounded-lg">
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 <span className="font-medium">{clientInfo.name}</span>
               </div>
-              <div className="text-sm text-gray-600">{clientInfo.phone}</div>
+              <div className="text-sm text-muted-foreground">{clientInfo.phone}</div>
             </div>
           )}
 
-          <div className="mb-4">
-            <Label>Mode de paiement</Label>
-            <Select value={paymentMethod} onValueChange={(value: PaymentMethod) => setPaymentMethod(value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Choisir le mode de paiement" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="cash">Espèces</SelectItem>
-                <SelectItem value="mobile_money">Mobile Money</SelectItem>
-                <SelectItem value="credit">Crédit</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="mb-4 max-h-[400px] overflow-y-auto">
+          <div className="h-[calc(100vh-26rem)] overflow-y-auto mb-4">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Produit</TableHead>
-                  <TableHead>Qté</TableHead>
-                  <TableHead>Prix</TableHead>
+                  <TableHead className="text-center">Qté</TableHead>
+                  <TableHead className="text-right">Prix</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
@@ -310,31 +269,33 @@ const POS = () => {
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">{item.name}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-center gap-2">
                         <Button 
                           variant="outline" 
-                          size="sm"
+                          size="icon"
+                          className="h-6 w-6"
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         >
                           <Minus className="h-3 w-3" />
                         </Button>
-                        <span>{item.quantity}</span>
+                        <span className="w-8 text-center">{item.quantity}</span>
                         <Button 
                           variant="outline" 
-                          size="sm"
+                          size="icon"
+                          className="h-6 w-6"
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         >
                           <Plus className="h-3 w-3" />
                         </Button>
                       </div>
                     </TableCell>
-                    <TableCell>{item.price * item.quantity} FCFA</TableCell>
+                    <TableCell className="text-right">{item.price * item.quantity}</TableCell>
                     <TableCell>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => removeFromCart(item.id)}
-                        className="text-red-500 hover:text-red-700"
+                        className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
                       >
                         ×
                       </Button>
@@ -344,14 +305,38 @@ const POS = () => {
               </TableBody>
             </Table>
           </div>
-          <div className="border-t pt-4">
-            <div className="flex justify-between mb-4">
-              <span className="font-bold">Total:</span>
-              <span className="font-bold">{calculateTotal()} FCFA</span>
+
+          <div className="space-y-4 pt-4 border-t">
+            <div>
+              <Label>Mode de paiement</Label>
+              <Select 
+                value={paymentMethod} 
+                onValueChange={(value: PaymentMethod) => {
+                  setPaymentMethod(value);
+                  if (value === "credit" && !clientInfo) {
+                    setShowClientDialog(true);
+                  }
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choisir le mode de paiement" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cash">Espèces</SelectItem>
+                  <SelectItem value="mobile_money">Mobile Money</SelectItem>
+                  <SelectItem value="credit">Crédit</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+
+            <div className="flex justify-between text-lg font-bold">
+              <span>Total:</span>
+              <span>{calculateTotal()} FCFA</span>
+            </div>
+
             <Button
               onClick={handleCheckout}
-              className="w-full bg-primary text-white"
+              className="w-full"
               size="lg"
             >
               Payer
@@ -360,7 +345,61 @@ const POS = () => {
         </Card>
       </div>
 
-      {/* Dialog pour les informations client */}
+      <Card className="flex-1 p-6">
+        <div className="flex items-center gap-4 mb-6">
+          <Button variant="ghost" size="icon">
+            <Home className="h-5 w-5" />
+          </Button>
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Input
+              type="search"
+              placeholder="Rechercher un produit..."
+              className="pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <Tabs defaultValue={categories[0].id} className="h-[calc(100vh-12rem)]">
+          <TabsList className="mb-4">
+            {categories.map((category) => (
+              <TabsTrigger key={category.id} value={category.id}>
+                {category.name}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          {categories.map((category) => (
+            <TabsContent key={category.id} value={category.id} className="h-full">
+              <div className="grid grid-cols-4 gap-4 h-full overflow-y-auto">
+                {filteredProducts.map((product) => (
+                  <Button
+                    key={product.id}
+                    variant="outline"
+                    className="h-auto aspect-square p-4 flex flex-col items-center justify-center gap-2"
+                    onClick={() => addToCart(product)}
+                  >
+                    {product.image ? (
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-20 h-20 object-cover rounded mb-2"
+                      />
+                    ) : (
+                      <Package className="h-20 w-20 mb-2 text-muted-foreground" />
+                    )}
+                    <span className="font-medium text-sm text-center line-clamp-2">{product.name}</span>
+                    <span className="text-sm text-muted-foreground">{product.price} FCFA</span>
+                  </Button>
+                ))}
+              </div>
+            </TabsContent>
+          ))}
+        </Tabs>
+      </Card>
+
       <Dialog open={showClientDialog} onOpenChange={setShowClientDialog}>
         <DialogContent>
           <DialogHeader>
@@ -407,7 +446,6 @@ const POS = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Modal du reçu */}
       <Dialog open={showReceipt} onOpenChange={setShowReceipt}>
         <DialogContent className="max-w-md">
           <DialogHeader>
