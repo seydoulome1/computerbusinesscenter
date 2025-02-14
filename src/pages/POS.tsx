@@ -165,6 +165,11 @@ const POS = () => {
     }
   };
 
+  // Définition de filteredProducts avant de l'utiliser dans le rendu
+  const filteredProducts = globalProducts.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="container mx-auto p-6 grid grid-cols-12 gap-6">
       {/* Section des produits */}
