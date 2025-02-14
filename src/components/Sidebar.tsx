@@ -9,74 +9,117 @@ import {
   Settings,
   AlertCircle,
   Users,
+  MessageSquare,
+  Mail,
+  CheckSquare,
 } from "lucide-react";
 
 export const Sidebar = () => {
   const menuItems = [
     {
-      path: "/",
-      name: "Tableau de bord",
-      icon: LayoutDashboard,
+      section: "E-Commerce",
+      items: [
+        {
+          path: "/",
+          name: "Tableau de bord",
+          icon: LayoutDashboard,
+        },
+        {
+          path: "/pos",
+          name: "Point de Vente",
+          icon: ShoppingCart,
+        },
+        {
+          path: "/products",
+          name: "Produits",
+          icon: Package,
+        },
+        {
+          path: "/clients",
+          name: "Clients",
+          icon: Users,
+        },
+      ],
     },
     {
-      path: "/pos",
-      name: "Point de Vente",
-      icon: ShoppingCart,
+      section: "Apps",
+      items: [
+        {
+          path: "/chat",
+          name: "Chat",
+          icon: MessageSquare,
+        },
+        {
+          path: "/email",
+          name: "Email",
+          icon: Mail,
+        },
+        {
+          path: "/todo",
+          name: "Todo",
+          icon: CheckSquare,
+        },
+      ],
     },
     {
-      path: "/products",
-      name: "Produits",
-      icon: Package,
-    },
-    {
-      path: "/reports",
-      name: "Rapports",
-      icon: FileText,
-    },
-    {
-      path: "/credits",
-      name: "Crédits",
-      icon: CreditCard,
-    },
-    {
-      path: "/clients",
-      name: "Clients",
-      icon: Users,
-    },
-    {
-      path: "/alerts",
-      name: "Alertes",
-      icon: AlertCircle,
-    },
-    {
-      path: "/settings",
-      name: "Paramètres",
-      icon: Settings,
+      section: "Pages",
+      items: [
+        {
+          path: "/reports",
+          name: "Rapports",
+          icon: FileText,
+        },
+        {
+          path: "/credits",
+          name: "Crédits",
+          icon: CreditCard,
+        },
+        {
+          path: "/alerts",
+          name: "Alertes",
+          icon: AlertCircle,
+        },
+        {
+          path: "/settings",
+          name: "Paramètres",
+          icon: Settings,
+        },
+      ],
     },
   ];
 
   return (
-    <aside className="bg-white w-64 min-h-screen p-4 shadow-lg">
+    <aside className="bg-white w-64 min-h-screen p-4 border-r">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-primary">EDOH GESCO</h2>
-        <p className="text-sm text-gray-500">Gestion commerciale</p>
+        <div className="flex items-center gap-2 px-4">
+          <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold">E</span>
+          </div>
+          <h2 className="text-xl font-semibold">EDOH GESCO</h2>
+        </div>
       </div>
-      <nav className="space-y-2">
-        {menuItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) =>
-              `flex items-center space-x-3 px-4 py-2 rounded-lg transition-colors ${
-                isActive
-                  ? "bg-primary text-white"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`
-            }
-          >
-            <item.icon className="h-5 w-5" />
-            <span>{item.name}</span>
-          </NavLink>
+
+      <nav className="space-y-8">
+        {menuItems.map((section) => (
+          <div key={section.section}>
+            <h3 className="text-xs uppercase text-gray-500 font-medium px-4 mb-2">
+              {section.section}
+            </h3>
+            <div className="space-y-1">
+              {section.items.map((item) => (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  className={({ isActive }) =>
+                    `sidebar-item ${isActive ? "active" : ""}`
+                  }
+                >
+                  <item.icon className="h-5 w-5" />
+                  <span>{item.name}</span>
+                </NavLink>
+              ))}
+            </div>
+          </div>
         ))}
       </nav>
     </aside>
