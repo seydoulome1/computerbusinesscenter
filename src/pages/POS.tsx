@@ -1,9 +1,10 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Package, Search, Printer, User, Plus, Minus, Home } from "lucide-react";
+import { Package, Search, Printer, User, Plus, Minus } from "lucide-react";
 import { globalProducts } from "./Products";
 import {
   Tabs,
@@ -347,9 +348,6 @@ const POS = () => {
 
       <Card className="flex-1 p-6">
         <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" size="icon">
-            <Home className="h-5 w-5" />
-          </Button>
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <Input
@@ -363,9 +361,13 @@ const POS = () => {
         </div>
 
         <Tabs defaultValue={categories[0].id} className="h-[calc(100vh-12rem)]">
-          <TabsList className="mb-4">
+          <TabsList className="mb-4 bg-transparent border-b w-full rounded-none">
             {categories.map((category) => (
-              <TabsTrigger key={category.id} value={category.id}>
+              <TabsTrigger 
+                key={category.id} 
+                value={category.id}
+                className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-6"
+              >
                 {category.name}
               </TabsTrigger>
             ))}
@@ -378,7 +380,7 @@ const POS = () => {
                   <Button
                     key={product.id}
                     variant="outline"
-                    className="h-auto aspect-square p-4 flex flex-col items-center justify-center gap-2"
+                    className="h-auto aspect-square p-4 flex flex-col items-center justify-center gap-2 hover:bg-secondary/50"
                     onClick={() => addToCart(product)}
                   >
                     {product.image ? (
