@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Package, Search, Printer, User } from "lucide-react";
+import { Package, Search, Printer, User, Plus, Minus } from "lucide-react";
 import { globalProducts } from "./Products";
 import {
   Table,
@@ -19,7 +19,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -28,6 +28,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 
 interface CartItem {
   id: string;
@@ -37,23 +39,29 @@ interface CartItem {
 }
 
 interface Client {
-  id: string;
   name: string;
   phone: string;
   email: string;
 }
 
-const demoClients: Client[] = [
-  { id: "1", name: "Jean Dupont", phone: "+229 97 12 34 56", email: "jean@example.com" },
-  { id: "2", name: "Marie Koné", phone: "+229 95 98 76 54", email: "marie@example.com" },
-];
+type PaymentMethod = "cash" | "mobile_money" | "credit";
+
+interface SaleData {
+  items: CartItem[];
+  total: number;
+  date: Date;
+  client?: Client;
+  paymentMethod: PaymentMethod;
+}
 
 const POS = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [showClientDialog, setShowClientDialog] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
-  const [currentSale, setCurrentSale] = useState<{ items: CartItem[]; total: number; date: Date; client?: Client } | null>(null);
+  const [currentSale, setCurrentSale] = useState<SaleData | null>(null);
+  const [clientInfo, setClientInfo] = useState<Client | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
   const { toast } = useToast();
 
   const addToCart = (product: typeof globalProducts[0]) => {
@@ -68,6 +76,15 @@ const POS = () => {
       }
       return [...currentCart, { ...product, quantity: 1 }];
     });
+  };
+
+  const updateQuantity = (productId: string, newQuantity: number) => {
+    if (newQuantity < 1) return;
+    setCart((currentCart) =>
+      currentCart.map((item) =>
+        item.id === productId ? { ...item, quantity: newQuantity } : item
+      )
+    );
   };
 
   const removeFromCart = (productId: string) => {
@@ -88,11 +105,34 @@ const POS = () => {
       return;
     }
 
-    const sale = {
+    if (paymentMethod === "credit" && !clientInfo) {
+      toast({
+        title: "Erreur",
+        description: "Les informations client sont obligatoires pour un paiement à crédit",
+        variant: "destructive",
+      });
+      setShowClientDialog(true);
+      return;
+    }
+
+    // Si ce n'est pas un crédit, on peut procéder directement à la vente
+    if (paymentMethod !== "credit") {
+      finalizeSale();
+    } else {
+      // Pour un crédit, on vérifie une dernière fois les infos client
+      if (clientInfo) {
+        finalizeSale();
+      }
+    }
+  };
+
+  const finalizeSale = () => {
+    const sale: SaleData = {
       items: [...cart],
       total: calculateTotal(),
       date: new Date(),
-      client: selectedClient || undefined
+      client: clientInfo || undefined,
+      paymentMethod: paymentMethod,
     };
 
     setCurrentSale(sale);
@@ -117,6 +157,7 @@ const POS = () => {
               .items { width: 100%; border-collapse: collapse; margin: 20px 0; }
               .items th, .items td { border: 1px solid #ddd; padding: 8px; text-align: left; }
               .total { text-align: right; margin-top: 20px; }
+              .payment-info { margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px; }
               @media print {
                 button { display: none; }
               }
@@ -131,6 +172,7 @@ const POS = () => {
                 <div>
                   <p>Client: ${currentSale.client.name}</p>
                   <p>Téléphone: ${currentSale.client.phone}</p>
+                  <p>Email: ${currentSale.client.email}</p>
                 </div>
               ` : ''}
             </div>
@@ -154,6 +196,13 @@ const POS = () => {
                 `).join('')}
               </tbody>
             </table>
+            <div class="payment-info">
+              <p>Mode de paiement: ${
+                currentSale?.paymentMethod === "cash" ? "Espèces" :
+                currentSale?.paymentMethod === "mobile_money" ? "Mobile Money" :
+                "Crédit"
+              }</p>
+            </div>
             <div class="total">
               <h3>Total: ${currentSale?.total} FCFA</h3>
             </div>
@@ -165,7 +214,6 @@ const POS = () => {
     }
   };
 
-  // Définition de filteredProducts avant de l'utiliser dans le rendu
   const filteredProducts = globalProducts.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -217,31 +265,36 @@ const POS = () => {
         <Card className="p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold">Panier</h2>
-            <Select onValueChange={(value) => {
-              const client = demoClients.find(c => c.id === value);
-              setSelectedClient(client || null);
-            }}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Sélectionner un client" />
-              </SelectTrigger>
-              <SelectContent>
-                {demoClients.map(client => (
-                  <SelectItem key={client.id} value={client.id}>
-                    {client.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Button variant="outline" onClick={() => setShowClientDialog(true)}>
+              <User className="h-4 w-4 mr-2" />
+              {clientInfo ? 'Modifier client' : 'Ajouter client'}
+            </Button>
           </div>
-          {selectedClient && (
+          
+          {clientInfo && (
             <div className="mb-4 p-3 bg-gray-50 rounded-lg">
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4" />
-                <span className="font-medium">{selectedClient.name}</span>
+                <span className="font-medium">{clientInfo.name}</span>
               </div>
-              <div className="text-sm text-gray-600">{selectedClient.phone}</div>
+              <div className="text-sm text-gray-600">{clientInfo.phone}</div>
             </div>
           )}
+
+          <div className="mb-4">
+            <Label>Mode de paiement</Label>
+            <Select value={paymentMethod} onValueChange={(value: PaymentMethod) => setPaymentMethod(value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Choisir le mode de paiement" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="cash">Espèces</SelectItem>
+                <SelectItem value="mobile_money">Mobile Money</SelectItem>
+                <SelectItem value="credit">Crédit</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="mb-4 max-h-[400px] overflow-y-auto">
             <Table>
               <TableHeader>
@@ -256,7 +309,25 @@ const POS = () => {
                 {cart.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell>{item.quantity}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        >
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <span>{item.quantity}</span>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </TableCell>
                     <TableCell>{item.price * item.quantity} FCFA</TableCell>
                     <TableCell>
                       <Button
@@ -289,6 +360,53 @@ const POS = () => {
         </Card>
       </div>
 
+      {/* Dialog pour les informations client */}
+      <Dialog open={showClientDialog} onOpenChange={setShowClientDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Informations du client</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Nom</Label>
+              <Input
+                className="col-span-3"
+                value={clientInfo?.name || ''}
+                onChange={(e) => setClientInfo(prev => ({ ...prev || {}, name: e.target.value } as Client))}
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Téléphone</Label>
+              <Input
+                className="col-span-3"
+                value={clientInfo?.phone || ''}
+                onChange={(e) => setClientInfo(prev => ({ ...prev || {}, phone: e.target.value } as Client))}
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Email</Label>
+              <Input
+                className="col-span-3"
+                type="email"
+                value={clientInfo?.email || ''}
+                onChange={(e) => setClientInfo(prev => ({ ...prev || {}, email: e.target.value } as Client))}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setClientInfo(null);
+              setShowClientDialog(false);
+            }}>
+              Annuler
+            </Button>
+            <Button onClick={() => setShowClientDialog(false)}>
+              Enregistrer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Modal du reçu */}
       <Dialog open={showReceipt} onOpenChange={setShowReceipt}>
         <DialogContent className="max-w-md">
@@ -306,6 +424,7 @@ const POS = () => {
               <div className="mb-4 p-3 bg-gray-50 rounded-lg">
                 <p className="font-medium">{currentSale.client.name}</p>
                 <p className="text-sm text-gray-600">{currentSale.client.phone}</p>
+                <p className="text-sm text-gray-600">{currentSale.client.email}</p>
               </div>
             )}
             <Table>
@@ -326,8 +445,15 @@ const POS = () => {
                 ))}
               </TableBody>
             </Table>
-            <div className="mt-4 text-right">
-              <p className="font-bold">Total: {currentSale?.total} FCFA</p>
+            <div className="mt-4">
+              <p className="text-sm text-gray-600">
+                Mode de paiement: {
+                  currentSale?.paymentMethod === "cash" ? "Espèces" :
+                  currentSale?.paymentMethod === "mobile_money" ? "Mobile Money" :
+                  "Crédit"
+                }
+              </p>
+              <p className="font-bold text-right">Total: {currentSale?.total} FCFA</p>
             </div>
             <Button 
               className="w-full mt-4"
@@ -335,7 +461,8 @@ const POS = () => {
                 handlePrintReceipt();
                 setShowReceipt(false);
                 setCart([]);
-                setSelectedClient(null);
+                setClientInfo(null);
+                setPaymentMethod("cash");
               }}
             >
               <Printer className="mr-2 h-4 w-4" />
