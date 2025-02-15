@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -23,6 +22,13 @@ import {
 
 const Settings = () => {
   const { user } = useAuth();
+  const [editingUser, setEditingUser] = useState(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const handleEditUser = (userData) => {
+    setEditingUser(userData);
+    setIsEditDialogOpen(true);
+  };
 
   return (
     <div className="container mx-auto p-6">
@@ -84,19 +90,79 @@ const Settings = () => {
                 </DialogContent>
               </Dialog>
             </div>
+
             <div className="space-y-4">
-              {/* Liste des utilisateurs existants */}
               <div className="grid gap-4">
-                {/* Exemple d'utilisateur */}
                 <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
                   <div>
                     <p className="font-medium">John Doe</p>
                     <p className="text-sm text-muted-foreground">Caissier - BOUTIQUE PRINCIPALE</p>
                   </div>
-                  <Button variant="outline">Modifier</Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => handleEditUser({
+                      name: "John Doe",
+                      role: "seller",
+                      store: "main",
+                      email: "john@example.com"
+                    })}
+                  >
+                    Modifier
+                  </Button>
                 </div>
               </div>
             </div>
+
+            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Modifier l'utilisateur</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid gap-2">
+                    <Label>Nom complet</Label>
+                    <Input 
+                      defaultValue={editingUser?.name}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Email</Label>
+                    <Input 
+                      type="email"
+                      defaultValue={editingUser?.email}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Rôle</Label>
+                    <Select defaultValue={editingUser?.role}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner un rôle" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="admin">Administrateur</SelectItem>
+                        <SelectItem value="supervisor">Superviseur</SelectItem>
+                        <SelectItem value="seller">Caissier</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Boutique</Label>
+                    <Select defaultValue={editingUser?.store}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner une boutique" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="main">BOUTIQUE PRINCIPALE</SelectItem>
+                        <SelectItem value="annex">BOUTIQUE ANNEXE</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <Button className="w-full" onClick={() => setIsEditDialogOpen(false)}>
+                  Enregistrer les modifications
+                </Button>
+              </DialogContent>
+            </Dialog>
           </Card>
         )}
 

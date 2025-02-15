@@ -38,11 +38,11 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Tableau de bord EDOH</h1>
+        <h1 className="text-3xl font-bold font-playfair">TABLEAU DE BORD EDOH PRESTATION</h1>
         <div className="flex gap-2">
           <select className="rounded-md border p-2">
-            <option>Boutique 711</option>
-            <option>Boutique 712</option>
+            <option>BOUTIQUE PRINCIPALE</option>
+            <option>BOUTIQUE ANNEXE</option>
           </select>
         </div>
       </div>
