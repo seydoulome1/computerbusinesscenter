@@ -17,7 +17,7 @@ import {
 export const Sidebar = () => {
   const menuItems = [
     {
-      section: "E-Commerce",
+      section: "Gestion",
       items: [
         {
           path: "/",
@@ -42,11 +42,11 @@ export const Sidebar = () => {
       ],
     },
     {
-      section: "Apps",
+      section: "Communication",
       items: [
         {
           path: "/chat",
-          name: "Chat",
+          name: "Messages",
           icon: MessageSquare,
         },
         {
@@ -56,13 +56,13 @@ export const Sidebar = () => {
         },
         {
           path: "/todo",
-          name: "Todo",
+          name: "Tâches",
           icon: CheckSquare,
         },
       ],
     },
     {
-      section: "Pages",
+      section: "Administration",
       items: [
         {
           path: "/reports",

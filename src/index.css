@@ -43,6 +43,15 @@
   }
   body {
     @apply bg-background text-foreground;
+    background: linear-gradient(
+      135deg,
+      rgba(155, 135, 245, 0.1) 0%,
+      rgba(126, 105, 171, 0.1) 50%,
+      rgba(241, 241, 241, 0.1) 100%
+    ),
+    url('/lovable-uploads/073e95e9-5629-4889-b16c-b36079d8dd0e.png') top left / cover no-repeat,
+    url('/lovable-uploads/a36cc777-f009-4a6f-919f-c87754eeee26.png') bottom right / cover no-repeat;
+    background-blend-mode: overlay, normal, normal;
   }
 }
 

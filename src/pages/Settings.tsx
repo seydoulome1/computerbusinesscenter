@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Select,
   SelectContent,
@@ -12,12 +13,93 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 const Settings = () => {
+  const { user } = useAuth();
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Paramètres</h1>
 
       <div className="grid gap-6">
+        {user.role === "admin" && (
+          <Card className="p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Gestion des Utilisateurs</h2>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button>Nouvel Utilisateur</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Créer un nouvel utilisateur</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="name">Nom complet</Label>
+                      <Input id="name" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input id="email" type="email" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="role">Rôle</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner un rôle" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="admin">Administrateur</SelectItem>
+                          <SelectItem value="supervisor">Superviseur</SelectItem>
+                          <SelectItem value="seller">Caissier</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="store">Boutique</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner une boutique" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="main">BOUTIQUE PRINCIPALE</SelectItem>
+                          <SelectItem value="annex">BOUTIQUE ANNEXE</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="password">Mot de passe</Label>
+                      <Input id="password" type="password" />
+                    </div>
+                  </div>
+                  <Button className="w-full">Créer l'utilisateur</Button>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <div className="space-y-4">
+              {/* Liste des utilisateurs existants */}
+              <div className="grid gap-4">
+                {/* Exemple d'utilisateur */}
+                <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
+                  <div>
+                    <p className="font-medium">John Doe</p>
+                    <p className="text-sm text-muted-foreground">Caissier - BOUTIQUE PRINCIPALE</p>
+                  </div>
+                  <Button variant="outline">Modifier</Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
         <Card className="p-6">
           <h2 className="text-xl font-bold mb-4">Informations de l'entreprise</h2>
           <div className="grid gap-4">
