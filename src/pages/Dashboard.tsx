@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   TrendingUp, Package, AlertTriangle, CreditCard, 
@@ -32,6 +31,14 @@ const categoryData = [
   { name: "Papeterie", ventes: 3000 },
   { name: "Bureautique", ventes: 2000 },
   { name: "Informatique", ventes: 2780 },
+];
+
+const topSellingProducts = [
+  { name: "Cahier 200 pages", quantity: 150, revenue: 75000 },
+  { name: "Stylo bleu", quantity: 300, revenue: 45000 },
+  { name: "Cartable", quantity: 50, revenue: 250000 },
+  { name: "Crayon", quantity: 200, revenue: 20000 },
+  { name: "Règle 30cm", quantity: 100, revenue: 25000 },
 ];
 
 const Dashboard = () => {
@@ -148,6 +155,34 @@ const Dashboard = () => {
                 </BarChart>
               </ResponsiveContainer>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="p-6">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">
+              Produits les plus vendus
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Produit</TableHead>
+                  <TableHead>Quantité vendue</TableHead>
+                  <TableHead>Chiffre d'affaires</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {topSellingProducts.map((product, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{product.name}</TableCell>
+                    <TableCell>{product.quantity}</TableCell>
+                    <TableCell>{product.revenue} FCFA</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
       </div>
