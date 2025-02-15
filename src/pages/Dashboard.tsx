@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   TrendingUp, Package, AlertTriangle, CreditCard, 
@@ -15,6 +16,14 @@ import {
   Bar,
   ResponsiveContainer 
 } from "recharts";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 // Données simulées pour les graphiques
 const salesData = [
@@ -101,7 +110,6 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {/* Graphiques */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-6">
           <CardHeader>
