@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Select,
   SelectContent,
@@ -22,14 +23,59 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  store: string;
+}
+
 const Settings = () => {
   const { user } = useAuth();
-  const [editingUser, setEditingUser] = useState(null);
+  const { toast } = useToast();
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [users, setUsers] = useState<User[]>([
+    {
+      id: "1",
+      name: "John Doe",
+      email: "john@example.com",
+      role: "seller",
+      store: "main"
+    },
+    // Ajoutez d'autres utilisateurs ici si nécessaire
+  ]);
 
-  const handleEditUser = (userData) => {
+  const handleEditUser = (userData: User) => {
     setEditingUser(userData);
     setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateUser = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    
+    if (editingUser) {
+      const updatedUser = {
+        ...editingUser,
+        name: formData.get('name') as string,
+        email: formData.get('email') as string,
+        role: formData.get('role') as string,
+        store: formData.get('store') as string,
+      };
+
+      setUsers(users.map(user => 
+        user.id === editingUser.id ? updatedUser : user
+      ));
+
+      toast({
+        title: "Modifications enregistrées",
+        description: "Les informations de l'utilisateur ont été mises à jour avec succès.",
+      });
+
+      setIsEditDialogOpen(false);
+    }
   };
 
   return (
@@ -83,10 +129,6 @@ const Settings = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="password">Mot de passe</Label>
-                      <Input id="password" type="password" />
-                    </div>
                   </div>
                   <Button className="w-full">Créer l'utilisateur</Button>
                 </DialogContent>
@@ -95,23 +137,22 @@ const Settings = () => {
 
             <div className="space-y-4">
               <div className="grid gap-4">
-                <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
-                  <div>
-                    <p className="font-medium">John Doe</p>
-                    <p className="text-sm text-muted-foreground">Caissier - BOUTIQUE PRINCIPALE</p>
+                {users.map((user) => (
+                  <div key={user.id} className="flex items-center justify-between p-4 bg-secondary rounded-lg">
+                    <div>
+                      <p className="font-medium">{user.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {user.role === 'seller' ? 'Caissier' : user.role === 'admin' ? 'Administrateur' : 'Superviseur'} - {user.store === 'main' ? 'BOUTIQUE PRINCIPALE' : 'BOUTIQUE ANNEXE'}
+                      </p>
+                    </div>
+                    <Button 
+                      variant="outline"
+                      onClick={() => handleEditUser(user)}
+                    >
+                      Modifier
+                    </Button>
                   </div>
-                  <Button 
-                    variant="outline"
-                    onClick={() => handleEditUser({
-                      name: "John Doe",
-                      role: "seller",
-                      store: "main",
-                      email: "john@example.com"
-                    })}
-                  >
-                    Modifier
-                  </Button>
-                </div>
+                ))}
               </div>
             </div>
 
@@ -120,23 +161,27 @@ const Settings = () => {
                 <DialogHeader>
                   <DialogTitle>Modifier l'utilisateur</DialogTitle>
                 </DialogHeader>
-                <div className="grid gap-4 py-4">
+                <form onSubmit={handleUpdateUser} className="grid gap-4 py-4">
                   <div className="grid gap-2">
-                    <Label>Nom complet</Label>
+                    <Label htmlFor="edit-name">Nom complet</Label>
                     <Input 
+                      id="edit-name"
+                      name="name"
                       defaultValue={editingUser?.name}
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label>Email</Label>
+                    <Label htmlFor="edit-email">Email</Label>
                     <Input 
+                      id="edit-email"
+                      name="email"
                       type="email"
                       defaultValue={editingUser?.email}
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label>Rôle</Label>
-                    <Select defaultValue={editingUser?.role}>
+                    <Label htmlFor="edit-role">Rôle</Label>
+                    <Select name="role" defaultValue={editingUser?.role}>
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un rôle" />
                       </SelectTrigger>
@@ -148,8 +193,8 @@ const Settings = () => {
                     </Select>
                   </div>
                   <div className="grid gap-2">
-                    <Label>Boutique</Label>
-                    <Select defaultValue={editingUser?.store}>
+                    <Label htmlFor="edit-store">Boutique</Label>
+                    <Select name="store" defaultValue={editingUser?.store}>
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner une boutique" />
                       </SelectTrigger>
@@ -159,10 +204,10 @@ const Settings = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                </div>
-                <Button className="w-full" onClick={() => setIsEditDialogOpen(false)}>
-                  Enregistrer les modifications
-                </Button>
+                  <Button type="submit" className="w-full">
+                    Enregistrer les modifications
+                  </Button>
+                </form>
               </DialogContent>
             </Dialog>
           </Card>
