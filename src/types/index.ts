@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   email: string;
@@ -24,12 +25,17 @@ export interface Sale {
     quantity: number;
     price: number;
   }[];
-  paymentMethod: 'cash' | 'mobile' | 'credit';
+  paymentMethod: 'cash' | 'mobile_money' | 'credit';
   total: number;
+  client?: Client;
+  dueDate?: Date;
 }
 
 export interface Client {
   id: string;
   name: string;
   contact: string;
+  email?: string;
+  address?: string;
+  dueDate?: Date;
 }

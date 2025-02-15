@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -48,6 +47,8 @@ interface Client {
   name: string;
   phone: string;
   email: string;
+  address: string;
+  dueDate?: Date;
 }
 
 type PaymentMethod = "cash" | "mobile_money" | "credit";
@@ -433,6 +434,28 @@ const POS = () => {
                 onChange={(e) => setClientInfo(prev => ({ ...prev || {}, email: e.target.value } as Client))}
               />
             </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Adresse</Label>
+              <Input
+                className="col-span-3"
+                value={clientInfo?.address || ''}
+                onChange={(e) => setClientInfo(prev => ({ ...prev || {}, address: e.target.value } as Client))}
+              />
+            </div>
+            {paymentMethod === 'credit' && (
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">Date d'échéance</Label>
+                <Input
+                  className="col-span-3"
+                  type="date"
+                  value={clientInfo?.dueDate ? new Date(clientInfo.dueDate).toISOString().split('T')[0] : ''}
+                  onChange={(e) => setClientInfo(prev => ({ 
+                    ...prev || {}, 
+                    dueDate: e.target.value ? new Date(e.target.value) : undefined 
+                  } as Client))}
+                />
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => {
@@ -441,7 +464,17 @@ const POS = () => {
             }}>
               Annuler
             </Button>
-            <Button onClick={() => setShowClientDialog(false)}>
+            <Button onClick={() => {
+              if (paymentMethod === 'credit' && !clientInfo?.dueDate) {
+                toast({
+                  title: "Erreur",
+                  description: "La date d'échéance est obligatoire pour un paiement à crédit",
+                  variant: "destructive",
+                });
+                return;
+              }
+              setShowClientDialog(false);
+            }}>
               Enregistrer
             </Button>
           </DialogFooter>
@@ -465,6 +498,12 @@ const POS = () => {
                 <p className="font-medium">{currentSale.client.name}</p>
                 <p className="text-sm text-gray-600">{currentSale.client.phone}</p>
                 <p className="text-sm text-gray-600">{currentSale.client.email}</p>
+                <p className="text-sm text-gray-600">{currentSale.client.address}</p>
+                {currentSale.client.dueDate && (
+                  <p className="text-sm font-medium text-primary">
+                    Date d'échéance: {currentSale.client.dueDate.toLocaleDateString()}
+                  </p>
+                )}
               </div>
             )}
             <Table>
