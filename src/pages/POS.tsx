@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -165,7 +166,7 @@ const POS = () => {
       receiptWindow.document.write(`
         <html>
           <head>
-            <title>Reçu - EDOH GESCO</title>
+            <title>Reçu - COMPUTER BUSINESS CENTER</title>
             <style>
               body { font-family: Arial, sans-serif; padding: 20px; }
               .header { text-align: center; margin-bottom: 20px; }
@@ -180,7 +181,9 @@ const POS = () => {
           </head>
           <body>
             <div class="header">
-              <h1>EDOH GESCO</h1>
+              <h1>COMPUTER BUSINESS CENTER</h1>
+              <p>Téléphone : +228 91254591, +228 99019805</p>
+              <p>Email : contact@computerbusinesscenter.fr</p>
               <p>Reçu de vente</p>
               <p>Date: ${currentSale?.date.toLocaleDateString()} ${currentSale?.date.toLocaleTimeString()}</p>
               ${currentSale?.client ? `
@@ -490,7 +493,9 @@ const POS = () => {
           </DialogHeader>
           <div className="py-4">
             <div className="text-center mb-4">
-              <h2 className="text-xl font-bold">EDOH GESCO</h2>
+              <h2 className="text-xl font-bold">COMPUTER BUSINESS CENTER</h2>
+              <p className="text-sm text-gray-600">Téléphone : +228 91254591, +228 99019805</p>
+              <p className="text-sm text-gray-600">Email : contact@computerbusinesscenter.fr</p>
               <p className="text-sm text-gray-600">
                 {currentSale?.date.toLocaleDateString()} {currentSale?.date.toLocaleTimeString()}
               </p>
@@ -557,4 +562,3 @@ const POS = () => {
 };
 
 export default POS;
-
