@@ -142,10 +142,15 @@ const Products = () => {
     if (productToDelete) {
       const updatedProducts = products.filter(product => product.id !== productToDelete);
       setProducts(updatedProducts);
-      globalProducts = updatedProducts.map(({ icon, ...rest }) => ({
+      
+      // Update globalProducts correctly without reassignment
+      const plainProducts = updatedProducts.map(({ icon, ...rest }) => ({
         ...rest,
         icon: undefined
       }));
+      globalProducts.length = 0;
+      plainProducts.forEach(product => globalProducts.push(product));
+      
       toast({
         title: "Succès",
         description: "Produit supprimé avec succès",
