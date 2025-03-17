@@ -11,7 +11,7 @@ export let globalProducts: Product[] = [
     stock: 45,
     alertThreshold: 10,
     image: "/images/souris.jpg",
-    icon: <Mouse className="w-full h-full p-2" />,
+    icon: undefined, // Will be set in a component
   },
   {
     id: "2",
@@ -21,7 +21,7 @@ export let globalProducts: Product[] = [
     stock: 12,
     alertThreshold: 3,
     image: "/images/imprimante.jpg",
-    icon: <Printer className="w-full h-full p-2" />,
+    icon: undefined,
   },
   {
     id: "3",
@@ -31,7 +31,7 @@ export let globalProducts: Product[] = [
     stock: 18,
     alertThreshold: 5,
     image: "/images/ecran22.jpg",
-    icon: <Monitor className="w-full h-full p-2" />,
+    icon: undefined,
   },
   {
     id: "4",
@@ -41,7 +41,7 @@ export let globalProducts: Product[] = [
     stock: 10,
     alertThreshold: 3,
     image: "/images/ecran24.jpg",
-    icon: <Monitor className="w-full h-full p-2" />,
+    icon: undefined,
   },
   {
     id: "5",
@@ -51,7 +51,7 @@ export let globalProducts: Product[] = [
     stock: 8,
     alertThreshold: 2,
     image: "/images/ecran27.jpg",
-    icon: <Monitor className="w-full h-full p-2" />,
+    icon: undefined,
   },
   {
     id: "6",
@@ -61,7 +61,7 @@ export let globalProducts: Product[] = [
     stock: 7,
     alertThreshold: 2,
     image: "/images/laptop-hp.jpg",
-    icon: <Laptop className="w-full h-full p-2" />,
+    icon: undefined,
   },
   {
     id: "7",
@@ -71,7 +71,7 @@ export let globalProducts: Product[] = [
     stock: 5,
     alertThreshold: 2,
     image: "/images/laptop-dell.jpg",
-    icon: <Laptop className="w-full h-full p-2" />,
+    icon: undefined,
   },
   {
     id: "8",
@@ -81,7 +81,7 @@ export let globalProducts: Product[] = [
     stock: 22,
     alertThreshold: 5,
     image: "/images/hdd-external.jpg",
-    icon: <HardDrive className="w-full h-full p-2" />,
+    icon: undefined,
   },
   {
     id: "9",
@@ -91,7 +91,7 @@ export let globalProducts: Product[] = [
     stock: 15,
     alertThreshold: 4,
     image: "/images/ssd-internal.jpg",
-    icon: <HardDrive className="w-full h-full p-2" />,
+    icon: undefined,
   },
   {
     id: "10",
@@ -101,7 +101,7 @@ export let globalProducts: Product[] = [
     stock: 20,
     alertThreshold: 5,
     image: "/images/souris-gaming.jpg",
-    icon: <Mouse className="w-full h-full p-2" />,
+    icon: undefined,
   },
   {
     id: "11",
@@ -111,7 +111,7 @@ export let globalProducts: Product[] = [
     stock: 18,
     alertThreshold: 4,
     image: "/images/clavier.jpg",
-    icon: <Package className="w-full h-full p-2" />,
+    icon: undefined,
   },
   {
     id: "12",
@@ -121,7 +121,7 @@ export let globalProducts: Product[] = [
     stock: 8,
     alertThreshold: 2,
     image: "/images/imprimante-canon.jpg",
-    icon: <Printer className="w-full h-full p-2" />,
+    icon: undefined,
   },
   {
     id: "13",
@@ -131,7 +131,7 @@ export let globalProducts: Product[] = [
     stock: 12,
     alertThreshold: 3,
     image: "/images/hdd-internal.jpg",
-    icon: <HardDrive className="w-full h-full p-2" />,
+    icon: undefined,
   },
   {
     id: "14",
@@ -141,7 +141,7 @@ export let globalProducts: Product[] = [
     stock: 6,
     alertThreshold: 2,
     image: "/images/laptop-lenovo.jpg",
-    icon: <Laptop className="w-full h-full p-2" />,
+    icon: undefined,
   },
   {
     id: "15",
@@ -151,6 +151,6 @@ export let globalProducts: Product[] = [
     stock: 35,
     alertThreshold: 10,
     image: "/images/cable-hdmi.jpg",
-    icon: <Package className="w-full h-full p-2" />,
+    icon: undefined,
   }
 ];

@@ -11,6 +11,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, Package, DollarSign, UserX } from "lucide-react";
 import { globalProducts } from "@/data/products";
+import { ProductIcon } from "@/components/products/ProductIcon";
 
 const Alerts = () => {
   const lowStockProducts = globalProducts.filter(

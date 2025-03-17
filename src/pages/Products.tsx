@@ -8,9 +8,15 @@ import { Product, ProductFormData } from "@/types/product";
 import { ProductTable } from "@/components/products/ProductTable";
 import { ProductFormDialog } from "@/components/products/ProductFormDialog";
 import { DeleteConfirmationDialog } from "@/components/products/DeleteConfirmationDialog";
+import { ProductIcon } from "@/components/products/ProductIcon";
 
 const Products = () => {
-  const [products, setProducts] = useState<Product[]>(globalProducts);
+  const [products, setProducts] = useState<Product[]>(
+    globalProducts.map(product => ({
+      ...product,
+      icon: <ProductIcon category={product.category} />
+    }))
+  );
   const [newProduct, setNewProduct] = useState<ProductFormData>({
     name: "",
     category: "",
@@ -73,7 +79,11 @@ const Products = () => {
 
     if (isEditMode && currentProductId) {
       updatedProducts = products.map(product => 
-        product.id === currentProductId ? { ...newProduct, id: currentProductId } : product
+        product.id === currentProductId ? { 
+          ...newProduct, 
+          id: currentProductId,
+          icon: <ProductIcon category={newProduct.category} />
+        } : product
       );
       toast({
         title: "Succès",
@@ -83,6 +93,7 @@ const Products = () => {
       const product: Product = {
         ...newProduct,
         id: Date.now().toString(),
+        icon: <ProductIcon category={newProduct.category} />
       };
       updatedProducts = [...products, product];
       toast({
@@ -92,7 +103,10 @@ const Products = () => {
     }
 
     setProducts(updatedProducts);
-    globalProducts = updatedProducts;
+    globalProducts = updatedProducts.map(({ icon, ...rest }) => ({
+      ...rest,
+      icon: undefined
+    }));
     resetForm();
     setIsAddEditDialogOpen(false);
   };
@@ -120,7 +134,10 @@ const Products = () => {
     if (productToDelete) {
       const updatedProducts = products.filter(product => product.id !== productToDelete);
       setProducts(updatedProducts);
-      globalProducts = updatedProducts;
+      globalProducts = updatedProducts.map(({ icon, ...rest }) => ({
+        ...rest,
+        icon: undefined
+      }));
       toast({
         title: "Succès",
         description: "Produit supprimé avec succès",
