@@ -4,7 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Package, Search, Printer, User, Plus, Minus } from "lucide-react";
-import { globalProducts } from "./Products";
+import { globalProducts } from "@/types/product";
+import "@/data/products";
+
 import {
   Tabs,
   TabsContent,
@@ -194,7 +196,7 @@ const POS = () => {
                 <tr>
                   <th>Produit</th>
                   <th>Quantité</th>
-                  <th>Prix unitaire</th>
+                  <th>Prix</th>
                   <th>Total</th>
                 </tr>
               </thead>
@@ -555,3 +557,4 @@ const POS = () => {
 };
 
 export default POS;
+

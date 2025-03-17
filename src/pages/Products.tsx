@@ -3,12 +3,15 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { globalProducts } from "@/data/products";
+import { globalProducts } from "@/types/product";
 import { Product, ProductFormData } from "@/types/product";
 import { ProductTable } from "@/components/products/ProductTable";
 import { ProductFormDialog } from "@/components/products/ProductFormDialog";
 import { DeleteConfirmationDialog } from "@/components/products/DeleteConfirmationDialog";
 import { ProductIcon } from "@/components/products/ProductIcon";
+
+// Import the data to ensure it's initialized
+import "@/data/products";
 
 const Products = () => {
   const [products, setProducts] = useState<Product[]>(
@@ -103,10 +106,15 @@ const Products = () => {
     }
 
     setProducts(updatedProducts);
-    globalProducts = updatedProducts.map(({ icon, ...rest }) => ({
+    
+    // Update the global products array (without React elements)
+    const plainProducts = updatedProducts.map(({ icon, ...rest }) => ({
       ...rest,
       icon: undefined
     }));
+    globalProducts.length = 0;
+    plainProducts.forEach(product => globalProducts.push(product));
+    
     resetForm();
     setIsAddEditDialogOpen(false);
   };

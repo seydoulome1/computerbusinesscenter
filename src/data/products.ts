@@ -1,8 +1,10 @@
 
 import { Package, Mouse, Printer, Monitor, Laptop, HardDrive } from "lucide-react";
-import { Product } from "@/types/product";
+import { Product, globalProducts } from "@/types/product";
 
-export let globalProducts: Product[] = [
+// Initialize the globalProducts array with our products data
+globalProducts.length = 0; // Clear the array
+globalProducts.push(
   {
     id: "1",
     name: "Souris sans fil Logitech M185",
@@ -153,4 +155,7 @@ export let globalProducts: Product[] = [
     image: "/images/cable-hdmi.jpg",
     icon: undefined,
   }
-];
+);
+
+// Export to make the array accessible in other modules
+export { globalProducts };

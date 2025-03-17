@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   Table,
@@ -10,7 +9,8 @@ import {
 } from "@/components/ui/table";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, Package, DollarSign, UserX } from "lucide-react";
-import { globalProducts } from "@/data/products";
+import { globalProducts } from "@/types/product";
+import "@/data/products";
 import { ProductIcon } from "@/components/products/ProductIcon";
 
 const Alerts = () => {
