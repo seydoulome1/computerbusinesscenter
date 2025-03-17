@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, Package, DollarSign, UserX } from "lucide-react";
-import { globalProducts } from "./Products";
+import { globalProducts } from "@/data/products";
 
 const Alerts = () => {
   const lowStockProducts = globalProducts.filter(
