@@ -93,9 +93,9 @@ export const Sidebar = () => {
       <div className="mb-8">
         <div className="flex items-center gap-2 px-4">
           <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold">E</span>
+            <span className="text-white font-bold">C</span>
           </div>
-          <h2 className="text-xl font-semibold">EDOH GESCO</h2>
+          <h2 className="text-xl font-semibold">COMPUTER BUSINESS CENTER</h2>
         </div>
       </div>
 

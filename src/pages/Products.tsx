@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Package } from "lucide-react";
+import { Package, Pencil, Trash2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -18,7 +18,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Product {
   id: string;
@@ -30,7 +42,6 @@ interface Product {
   image: string;
 }
 
-// État global des produits (simulé)
 export let globalProducts: Product[] = [
   {
     id: "1",
@@ -180,13 +191,17 @@ const Products = () => {
     image: "/placeholder.svg",
   });
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [currentProductId, setCurrentProductId] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
+  const [isAddEditDialogOpen, setIsAddEditDialogOpen] = useState(false);
 
   const { toast } = useToast();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedImage(e.target.files[0]);
-      // Pour la démonstration, on utilise une URL locale
       setNewProduct({
         ...newProduct,
         image: URL.createObjectURL(e.target.files[0]),
@@ -194,25 +209,7 @@ const Products = () => {
     }
   };
 
-  const handleAddProduct = () => {
-    if (!newProduct.name || !newProduct.category) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez remplir tous les champs obligatoires",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const product: Product = {
-      ...newProduct,
-      id: Date.now().toString(),
-    };
-
-    const updatedProducts = [...products, product];
-    setProducts(updatedProducts);
-    globalProducts = updatedProducts; // Mise à jour de l'état global
-
+  const resetForm = () => {
     setNewProduct({
       name: "",
       category: "",
@@ -222,105 +219,89 @@ const Products = () => {
       image: "/placeholder.svg",
     });
     setSelectedImage(null);
+    setIsEditMode(false);
+    setCurrentProductId(null);
+  };
 
-    toast({
-      title: "Succès",
-      description: "Produit ajouté avec succès",
+  const handleAddOrEditProduct = () => {
+    if (!newProduct.name || !newProduct.category) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    let updatedProducts: Product[];
+
+    if (isEditMode && currentProductId) {
+      updatedProducts = products.map(product => 
+        product.id === currentProductId ? { ...newProduct, id: currentProductId } : product
+      );
+      toast({
+        title: "Succès",
+        description: "Produit modifié avec succès",
+      });
+    } else {
+      const product: Product = {
+        ...newProduct,
+        id: Date.now().toString(),
+      };
+      updatedProducts = [...products, product];
+      toast({
+        title: "Succès",
+        description: "Produit ajouté avec succès",
+      });
+    }
+
+    setProducts(updatedProducts);
+    globalProducts = updatedProducts;
+    resetForm();
+    setIsAddEditDialogOpen(false);
+  };
+
+  const handleEditClick = (product: Product) => {
+    setNewProduct({
+      name: product.name,
+      category: product.category,
+      price: product.price,
+      stock: product.stock,
+      alertThreshold: product.alertThreshold,
+      image: product.image,
     });
+    setCurrentProductId(product.id);
+    setIsEditMode(true);
+    setIsAddEditDialogOpen(true);
+  };
+
+  const handleDeleteClick = (productId: string) => {
+    setProductToDelete(productId);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (productToDelete) {
+      const updatedProducts = products.filter(product => product.id !== productToDelete);
+      setProducts(updatedProducts);
+      globalProducts = updatedProducts;
+      toast({
+        title: "Succès",
+        description: "Produit supprimé avec succès",
+      });
+      setIsDeleteDialogOpen(false);
+      setProductToDelete(null);
+    }
   };
 
   return (
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Gestion des Produits</h1>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>Ajouter un produit</Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Ajouter un nouveau produit</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <label>Image du produit</label>
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="cursor-pointer"
-                />
-                {newProduct.image && (
-                  <div className="relative w-32 h-32 mx-auto">
-                    <img
-                      src={newProduct.image}
-                      alt="Aperçu"
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  </div>
-                )}
-              </div>
-              <div className="grid gap-2">
-                <label>Nom du produit</label>
-                <Input
-                  value={newProduct.name}
-                  onChange={(e) =>
-                    setNewProduct({ ...newProduct, name: e.target.value })
-                  }
-                />
-              </div>
-              <div className="grid gap-2">
-                <label>Catégorie</label>
-                <Input
-                  value={newProduct.category}
-                  onChange={(e) =>
-                    setNewProduct({ ...newProduct, category: e.target.value })
-                  }
-                />
-              </div>
-              <div className="grid gap-2">
-                <label>Prix</label>
-                <Input
-                  type="number"
-                  value={newProduct.price}
-                  onChange={(e) =>
-                    setNewProduct({
-                      ...newProduct,
-                      price: Number(e.target.value),
-                    })
-                  }
-                />
-              </div>
-              <div className="grid gap-2">
-                <label>Stock</label>
-                <Input
-                  type="number"
-                  value={newProduct.stock}
-                  onChange={(e) =>
-                    setNewProduct({
-                      ...newProduct,
-                      stock: Number(e.target.value),
-                    })
-                  }
-                />
-              </div>
-              <div className="grid gap-2">
-                <label>Seuil d'alerte</label>
-                <Input
-                  type="number"
-                  value={newProduct.alertThreshold}
-                  onChange={(e) =>
-                    setNewProduct({
-                      ...newProduct,
-                      alertThreshold: Number(e.target.value),
-                    })
-                  }
-                />
-              </div>
-              <Button onClick={handleAddProduct}>Ajouter</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <Button onClick={() => {
+          resetForm();
+          setIsAddEditDialogOpen(true);
+        }}>Ajouter un produit</Button>
       </div>
 
       <Card className="p-6">
@@ -333,6 +314,7 @@ const Products = () => {
               <TableHead>Prix</TableHead>
               <TableHead>Stock</TableHead>
               <TableHead>Seuil d'alerte</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -356,11 +338,143 @@ const Products = () => {
                 <TableCell>{product.price} FCFA</TableCell>
                 <TableCell>{product.stock}</TableCell>
                 <TableCell>{product.alertThreshold}</TableCell>
+                <TableCell>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={() => handleEditClick(product)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="text-red-500 hover:text-red-700" 
+                      onClick={() => handleDeleteClick(product.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </Card>
+
+      <Dialog open={isAddEditDialogOpen} onOpenChange={setIsAddEditDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{isEditMode ? "Modifier un produit" : "Ajouter un nouveau produit"}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label>Image du produit</label>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="cursor-pointer"
+              />
+              {newProduct.image && (
+                <div className="relative w-32 h-32 mx-auto">
+                  <img
+                    src={newProduct.image}
+                    alt="Aperçu"
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                </div>
+              )}
+            </div>
+            <div className="grid gap-2">
+              <label>Nom du produit</label>
+              <Input
+                value={newProduct.name}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, name: e.target.value })
+                }
+              />
+            </div>
+            <div className="grid gap-2">
+              <label>Catégorie</label>
+              <Input
+                value={newProduct.category}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, category: e.target.value })
+                }
+              />
+            </div>
+            <div className="grid gap-2">
+              <label>Prix</label>
+              <Input
+                type="number"
+                value={newProduct.price}
+                onChange={(e) =>
+                  setNewProduct({
+                    ...newProduct,
+                    price: Number(e.target.value),
+                  })
+                }
+              />
+            </div>
+            <div className="grid gap-2">
+              <label>Stock</label>
+              <Input
+                type="number"
+                value={newProduct.stock}
+                onChange={(e) =>
+                  setNewProduct({
+                    ...newProduct,
+                    stock: Number(e.target.value),
+                  })
+                }
+              />
+            </div>
+            <div className="grid gap-2">
+              <label>Seuil d'alerte</label>
+              <Input
+                type="number"
+                value={newProduct.alertThreshold}
+                onChange={(e) =>
+                  setNewProduct({
+                    ...newProduct,
+                    alertThreshold: Number(e.target.value),
+                  })
+                }
+              />
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => {
+                resetForm();
+                setIsAddEditDialogOpen(false);
+              }}>
+                Annuler
+              </Button>
+              <Button onClick={handleAddOrEditProduct}>
+                {isEditMode ? "Modifier" : "Ajouter"}
+              </Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer ce produit?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action ne peut pas être annulée. Le produit sera définitivement supprimé.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>Annuler</AlertDialogCancel>
+            <AlertDialogAction className="bg-red-500 hover:bg-red-700" onClick={confirmDelete}>
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

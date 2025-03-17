@@ -54,7 +54,7 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold font-playfair">TABLEAU DE BORD EDOH PRESTATION</h1>
+        <h1 className="text-3xl font-bold font-playfair">TABLEAU DE BORD COMPUTER BUSINESS CENTER</h1>
         <div className="flex gap-2">
           <select className="rounded-md border p-2">
             <option>BOUTIQUE PRINCIPALE</option>
